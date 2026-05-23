@@ -24,13 +24,12 @@ export function AppNav() {
           </span>
         </Link>
         <div className="flex flex-wrap items-center gap-2">
-          <Link
-            to="/iscrizione"
-            hash="regolamento"
+          <a
+            href="/iscrizione#regolamento"
             className="rounded-full border border-white/70 bg-white/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground hover:bg-white/80 hover:text-foreground"
           >
             Regolamento
-          </Link>
+          </a>
           <ul className="grid grid-cols-2 gap-2 rounded-2xl border border-white/70 bg-white/70 p-2 shadow-glow backdrop-blur-2xl sm:flex sm:items-center sm:gap-1 sm:rounded-full sm:p-1">
           {nav.map(({ to, label, icon: Icon }) => {
             const active = loc.pathname === to;
