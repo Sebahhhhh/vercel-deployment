@@ -5,7 +5,6 @@ import {
   assertAdminAccess,
   assertAdminToken,
   checkAdminPassword,
-  checkAdminTotp,
   createAdminToken,
 } from "@/lib/admin-auth";
 
@@ -24,32 +23,13 @@ function requireToken(adminToken: string) {
 }
 
 export const adminVerify = createServerFn({ method: "POST" })
-  .inputValidator((d) =>
-    z.object({ password: z.string(), totpCode: z.string() }).parse(d),
-  )
-  .handler(async ({ data }) => {
-    assertAdminAccess(data.password, data.totpCode);
-    return { ok: true, adminToken: createAdminToken(), expiresIn: 7200 };
-  });
-
-/** Solo password — per UI a due step (prima password, poi 2FA). */
-export const adminVerifyPassword = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ password: z.string() }).parse(d))
   .handler(async ({ data }) => {
-    checkAdminPassword(data.password);
-    return { ok: true };
+    assertAdminAccess(data.password);
+      return { ok: true, adminToken: createAdminToken(), expiresIn: 7200 };
   });
 
-/** Solo 2FA — dopo password verificata lato client. */
-export const adminVerifyTotp = createServerFn({ method: "POST" })
-  .inputValidator((d) =>
-    z.object({ password: z.string(), totpCode: z.string() }).parse(d),
-  )
-  .handler(async ({ data }) => {
-    checkAdminPassword(data.password);
-    checkAdminTotp(data.totpCode);
-    return { ok: true, adminToken: createAdminToken(), expiresIn: 7200 };
-  });
+// 2FA endpoints removed; single-step `adminVerify` returns the admin token.
 
 const settingKey = z.enum([
   "regolamento",

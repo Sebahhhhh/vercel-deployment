@@ -1,5 +1,4 @@
 import { createHmac, timingSafeEqual, createHash, randomBytes } from "node:crypto";
-import { verifySync } from "otplib";
 
 const TOKEN_TTL_MS = 2 * 60 * 60 * 1000; // 2 ore
 
@@ -19,20 +18,7 @@ export function checkAdminPassword(input: string) {
   }
 }
 
-export function checkAdminTotp(code: string) {
-  const secret = process.env.ADMIN_TOTP_SECRET;
-  if (!secret) {
-    throw new Error("2FA non configurato (ADMIN_TOTP_SECRET)");
-  }
-  const normalized = code.replace(/\s/g, "");
-  if (!/^\d{6}$/.test(normalized)) {
-    throw new Error("Codice 2FA non valido (6 cifre)");
-  }
-  const ok = verifySync({ secret, token: normalized });
-  if (!ok) {
-    throw new Error("Codice 2FA errato o scaduto");
-  }
-}
+// 2FA removed: no TOTP check
 
 function sessionSecret(): string {
   const s = process.env.ADMIN_SESSION_SECRET ?? process.env.ADMIN_PASSWORD;
@@ -70,9 +56,8 @@ export function validateAdminToken(token: string) {
   }
 }
 
-export function assertAdminAccess(password: string, totpCode: string) {
+export function assertAdminAccess(password: string) {
   checkAdminPassword(password);
-  checkAdminTotp(totpCode);
 }
 
 export function assertAdminToken(adminToken: string) {
