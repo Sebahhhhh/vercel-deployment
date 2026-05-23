@@ -3,30 +3,28 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Plus, Trash2, Loader2, ShieldCheck, Lock, Users, UserPlus, Crown, Sparkles, Mail, LogIn, LogOut } from "lucide-react";
+import { Plus, Trash2, Loader2, ShieldCheck, Lock, Users, UserPlus, Crown, Sparkles, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
-import { signInWithGoogle } from "@/lib/google-auth";
-import { useAuth } from "@/hooks/use-auth";
 import { PageShell, TOURNAMENT_NAME, SUPPORT_EMAIL } from "@/components/Layout";
 
 const INSTITUTIONAL_EMAIL = /^[a-z]+\.[a-z]+\.studente@itispaleocapa\.it$/;
-const EXPECTED_EMAIL_KEY = "court_expected_email";
+const ACTIVE_EMAIL_KEY = "court_active_email";
 const DEVICE_LOCK_KEY = "court_registration_email_lock";
 
-function loadExpectedEmail() {
+function loadActiveEmail() {
   if (typeof sessionStorage === "undefined") return null;
-  return sessionStorage.getItem(EXPECTED_EMAIL_KEY);
+  return sessionStorage.getItem(ACTIVE_EMAIL_KEY);
 }
 
-function saveExpectedEmail(email: string) {
+function saveActiveEmail(email: string) {
   if (typeof sessionStorage === "undefined") return;
-  sessionStorage.setItem(EXPECTED_EMAIL_KEY, email);
+  sessionStorage.setItem(ACTIVE_EMAIL_KEY, email);
 }
 
-function clearExpectedEmail() {
+function clearActiveEmail() {
   if (typeof sessionStorage === "undefined") return;
-  sessionStorage.removeItem(EXPECTED_EMAIL_KEY);
+  sessionStorage.removeItem(ACTIVE_EMAIL_KEY);
 }
 
 function loadDeviceLock() {
@@ -58,11 +56,11 @@ const emptyMember = (): Member => ({ first_name: "", last_name: "", class: "" })
 
 function Iscrizione() {
   const qc = useQueryClient();
-  const { user, loading, signOut } = useAuth();
   const [signingIn, setSigningIn] = useState(false);
   const [emailInput, setEmailInput] = useState("");
-  const [expectedEmail, setExpectedEmail] = useState<string | null>(() => loadExpectedEmail());
+  const [activeEmail, setActiveEmail] = useState<string | null>(() => loadActiveEmail());
   const [showEmailPrompt, setShowEmailPrompt] = useState(false);
+  const [emailConfirmed, setEmailConfirmed] = useState(() => !!loadActiveEmail());
   const [accepted, setAccepted] = useState(false);
   const [teamName, setTeamName] = useState("");
   const [captain, setCaptain] = useState({ first_name: "", last_name: "", class: "", phone: "" });
@@ -71,24 +69,15 @@ function Iscrizione() {
   const [submitting, setSubmitting] = useState(false);
   const [signInError, setSignInError] = useState<string | null>(null);
 
-  const sessionEmail = user?.email?.toLowerCase() ?? null;
+  const sessionEmail = activeEmail?.toLowerCase() ?? null;
   const emailValid = !!sessionEmail && INSTITUTIONAL_EMAIL.test(sessionEmail);
   const deviceLock = loadDeviceLock();
 
   useEffect(() => {
     if (!sessionEmail) return;
-    const storedExpected = loadExpectedEmail();
-    if (storedExpected && sessionEmail !== storedExpected) {
-      toast.error("L'email Google non coincide con quella inserita.");
-      clearExpectedEmail();
-      void signOut();
-      return;
-    }
-    if (storedExpected && sessionEmail === storedExpected) {
-      clearExpectedEmail();
-      setExpectedEmail(null);
-    }
-  }, [sessionEmail, signOut]);
+    saveActiveEmail(sessionEmail);
+    setEmailConfirmed(true);
+  }, [sessionEmail]);
 
   const { data: teams = [] } = useQuery({
     queryKey: ["teams-count"],
@@ -121,7 +110,7 @@ function Iscrizione() {
   const remaining = Math.max(0, maxTeams - teams.length);
   const closed = !registrationsOpen || remaining === 0;
 
-  const loginWithGoogle = async () => {
+  const confirmInstitutionalEmail = async () => {
     if (!showEmailPrompt) {
       setShowEmailPrompt(true);
       return;
@@ -138,19 +127,12 @@ function Iscrizione() {
     setSigningIn(true);
     setSignInError(null);
     try {
-      saveExpectedEmail(normalized);
-      setExpectedEmail(normalized);
-      const { redirected, error } = await signInWithGoogle();
-      if (error) {
-        setSignInError(error);
-        toast.error(error);
-      }
-      if (!redirected && !error) {
-        toast.success("Accesso effettuato");
-        qc.invalidateQueries();
-      }
+      setActiveEmail(normalized);
+      saveActiveEmail(normalized);
+      setEmailConfirmed(true);
+      qc.invalidateQueries();
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Errore accesso Google";
+      const msg = e instanceof Error ? e.message : "Errore";
       setSignInError(msg);
       toast.error(msg);
     } finally {
@@ -158,8 +140,13 @@ function Iscrizione() {
     }
   };
 
-  const handleLogout = async () => {
-    await signOut();
+  const handleResetEmail = () => {
+    clearActiveEmail();
+    setActiveEmail(null);
+    setEmailConfirmed(false);
+    setEmailInput("");
+    setShowEmailPrompt(false);
+    setSignInError(null);
   };
 
   const submit = async () => {
@@ -169,7 +156,7 @@ function Iscrizione() {
       const r = riserve.map((m) => memberSchema.parse(m));
       if (!teamName.trim()) throw new Error("Nome squadra richiesto");
       if (!accepted) throw new Error("Devi accettare il regolamento");
-      if (!emailValid || !user) throw new Error("Usa un account nome.cognome.studente@itispaleocapa.it");
+      if (!emailValid || !sessionEmail) throw new Error("Email istituzionale non valida");
       if (deviceLock && deviceLock !== sessionEmail) {
         throw new Error("Questo dispositivo ha già registrato una squadra con un'altra email");
       }
@@ -187,7 +174,7 @@ function Iscrizione() {
         captain_class: c.class,
         captain_phone: c.phone,
         captain_email: sessionEmail,
-        created_by: user.id,
+        created_by: sessionEmail,
       }).select().single();
       if (error) {
         if (error.code === "23505" || /duplicate|unique/i.test(error.message)) {
@@ -215,34 +202,7 @@ function Iscrizione() {
     }
   };
 
-  if (loading) {
-    return (
-      <PageShell title="Iscrizione">
-        <div className="flex items-center justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
-      </PageShell>
-    );
-  }
-
-  if (user && !emailValid) {
-    return (
-      <PageShell title="Accesso non valido" subtitle="Account istituzionale obbligatorio">
-        <div className="rounded-2xl bg-card p-6 text-center shadow-soft">
-          <ShieldCheck className="mx-auto h-10 w-10 text-yellow-500" />
-          <p className="mt-3 text-sm text-muted-foreground">
-            Hai effettuato l&apos;accesso con un account che non rispetta il formato richiesto.
-          </p>
-          <button
-            onClick={handleLogout}
-            className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-soft"
-          >
-            <LogOut className="h-4 w-4" /> Esci e riprova con Google
-          </button>
-        </div>
-      </PageShell>
-    );
-  }
-
-  if (closed && !myTeam) {
+  if (closed && !myTeam && emailConfirmed) {
     return (
       <PageShell title="Iscrizioni chiuse" subtitle={`${maxTeams}/${maxTeams} squadre raggiunte`}>
         <div className="rounded-2xl bg-card p-6 text-center shadow-soft">
@@ -253,9 +213,9 @@ function Iscrizione() {
     );
   }
 
-  if (!user) {
+  if (!emailConfirmed) {
     return (
-      <PageShell title="Iscrizione" subtitle="Login Google · Supabase">
+      <PageShell title="Iscrizione" subtitle="Accesso istituzionale">
         <AnnouncementBanner />
         <div className="mb-4 card-arena border-secondary/40 bg-secondary/5 p-4 text-sm">
           <div className="flex items-start gap-3">
@@ -267,9 +227,6 @@ function Iscrizione() {
         </div>
 
         <div className="card-arena p-6 text-center">
-          {!showEmailPrompt && (
-            <p className="text-sm text-muted-foreground">Accedi con Google per iscrivere la squadra.</p>
-          )}
           {showEmailPrompt && (
             <label className="mt-4 block text-left">
               <span className="mb-1 block text-xs font-medium text-muted-foreground">Email istituzionale</span>
@@ -282,7 +239,7 @@ function Iscrizione() {
             </label>
           )}
           <button
-            onClick={loginWithGoogle}
+            onClick={confirmInstitutionalEmail}
             disabled={signingIn}
             className="btn-primary mt-6 w-full"
           >
@@ -299,10 +256,6 @@ function Iscrizione() {
             Continua con Google
           </button>
           {signInError && <p className="mt-3 text-sm text-destructive">{signInError}</p>}
-          <p className="mt-4 text-left text-xs text-muted-foreground leading-relaxed">
-            Abilita Google in Supabase → Authentication → Providers e aggiungi{" "}
-            <code className="text-secondary">http://localhost:5173/**</code> e il dominio Vercel nei Redirect URLs.
-          </p>
         </div>
       </PageShell>
     );
@@ -318,10 +271,10 @@ function Iscrizione() {
           <p className="mt-1 text-sm text-muted-foreground">La tua squadra <strong>{myTeam.name}</strong> è in posizione tabellone <strong>#{myTeam.bracket_slot}</strong>.</p>
           <p className="mt-2 text-xs text-muted-foreground">Email: {sessionEmail}</p>
           <button
-            onClick={handleLogout}
+            onClick={handleResetEmail}
             className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-secondary px-4 py-3 text-sm font-semibold text-foreground shadow-soft"
           >
-            <LogOut className="h-4 w-4" /> Esci
+            Cambia email
           </button>
         </div>
       </PageShell>
@@ -332,7 +285,7 @@ function Iscrizione() {
     <PageShell title="Iscrivi la squadra" subtitle={`${remaining} posti rimanenti su ${maxTeams}`}>
       <div className="mb-3 flex items-center justify-between rounded-xl bg-card px-3 py-2 text-xs shadow-soft">
         <span className="truncate text-muted-foreground">Email: {sessionEmail}</span>
-        <button onClick={handleLogout} className="text-xs font-semibold text-accent hover:underline">Esci</button>
+        <button onClick={handleResetEmail} className="text-xs font-semibold text-accent hover:underline">Cambia email</button>
       </div>
 
       <details className="mb-4 rounded-2xl bg-card p-4 shadow-soft">
