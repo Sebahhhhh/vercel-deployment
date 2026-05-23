@@ -38,7 +38,7 @@
 :root {
   --radius: 1.1rem;
   --background: #f5f7ff;
-  --foreground: #0f172a;
+  --foreground: #0b1220;
   --card: #ffffff;
   --card-foreground: #0f172a;
   --primary: #3a6cff;
@@ -46,7 +46,7 @@
   --secondary: #35d0ff;
   --secondary-foreground: #ecfbff;
   --muted: #edf1ff;
-  --muted-foreground: #5a6a86;
+  --muted-foreground: #4b5a76;
   --accent: #ffa96b;
   --accent-foreground: #1a1100;
   --destructive: #e84973;
@@ -69,7 +69,7 @@
     radial-gradient(circle at 8% 85%, oklch(0.97 0.08 315 / 0.55), transparent 38%),
     radial-gradient(circle at 70% 78%, oklch(0.98 0.06 200 / 0.4), transparent 40%),
     linear-gradient(180deg, #fcfdff 0%, #eef2ff 100%);
-  --glass-surface: linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.62));
+  --glass-surface: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
   --glass-border: color-mix(in oklab, var(--border) 58%, white);
   --glass-highlight: linear-gradient(130deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));
   --glass-shadow: 0 30px 70px -38px oklch(0.24 0.08 260 / 0.3);
@@ -86,12 +86,15 @@
     color: var(--foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    line-height: 1.6;
   }
   body { margin: 0; }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
     font-weight: 700;
     letter-spacing: -0.03em;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
   }
   a, button, input, textarea, select { -webkit-tap-highlight-color: transparent; }
 }
@@ -222,6 +225,17 @@
     backdrop-filter: blur(18px) saturate(170%);
     -webkit-backdrop-filter: blur(18px) saturate(170%);
     box-shadow: 0 1px 0 color-mix(in oklab, var(--border) 60%, white), 0 26px 46px -28px oklch(0.22 0.06 255 / 0.3);
+  }
+  .card-arena::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255, 255, 255, 0.7), transparent 38%),
+      radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.5), transparent 40%),
+      repeating-linear-gradient(120deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12) 1px, transparent 1px, transparent 6px);
+    opacity: 0.5;
+    pointer-events: none;
   }
   .label-caps {
     @apply text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground;

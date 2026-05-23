@@ -62,6 +62,7 @@ function Iscrizione() {
   const [signingIn, setSigningIn] = useState(false);
   const [emailInput, setEmailInput] = useState("");
   const [expectedEmail, setExpectedEmail] = useState<string | null>(() => loadExpectedEmail());
+  const [showEmailPrompt, setShowEmailPrompt] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [teamName, setTeamName] = useState("");
   const [captain, setCaptain] = useState({ first_name: "", last_name: "", class: "", phone: "" });
@@ -121,9 +122,13 @@ function Iscrizione() {
   const closed = !registrationsOpen || remaining === 0;
 
   const loginWithGoogle = async () => {
+    if (!showEmailPrompt) {
+      setShowEmailPrompt(true);
+      return;
+    }
     const normalized = emailInput.trim().toLowerCase();
     if (!INSTITUTIONAL_EMAIL.test(normalized)) {
-      setSignInError("Inserisci un'email valida: nome.cognome.studente@itispaleocapa.it");
+      setSignInError("Email istituzionale non valida");
       return;
     }
     if (deviceLock && deviceLock !== normalized) {
@@ -220,7 +225,7 @@ function Iscrizione() {
 
   if (user && !emailValid) {
     return (
-      <PageShell title="Accesso non valido" subtitle="Usa un account nome.cognome.studente@itispaleocapa.it">
+      <PageShell title="Accesso non valido" subtitle="Account istituzionale obbligatorio">
         <div className="rounded-2xl bg-card p-6 text-center shadow-soft">
           <ShieldCheck className="mx-auto h-10 w-10 text-yellow-500" />
           <p className="mt-3 text-sm text-muted-foreground">
@@ -256,23 +261,26 @@ function Iscrizione() {
           <div className="flex items-start gap-3">
             <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-secondary" />
             <p>
-              Account scolastico <strong>nome.cognome.studente@itispaleocapa.it</strong> obbligatorio.
+              <strong>Account istituzionale obbligatorio per iscrizione delle squadre.</strong>
             </p>
           </div>
         </div>
 
         <div className="card-arena p-6 text-center">
-          <p className="text-sm text-muted-foreground">Inserisci prima l&apos;email istituzionale, poi accedi con Google.</p>
-          <label className="mt-4 block text-left">
-            <span className="mb-1 block text-xs font-medium text-muted-foreground">Email istituzionale</span>
-            <input
-              type="email"
-              value={emailInput}
-              onChange={(e) => setEmailInput(e.target.value)}
-              placeholder="nome.cognome.studente@itispaleocapa.it"
-              className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
-            />
-          </label>
+          {!showEmailPrompt && (
+            <p className="text-sm text-muted-foreground">Accedi con Google per iscrivere la squadra.</p>
+          )}
+          {showEmailPrompt && (
+            <label className="mt-4 block text-left">
+              <span className="mb-1 block text-xs font-medium text-muted-foreground">Email istituzionale</span>
+              <input
+                type="email"
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+              />
+            </label>
+          )}
           <button
             onClick={loginWithGoogle}
             disabled={signingIn}
@@ -288,7 +296,7 @@ function Iscrizione() {
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
               </svg>
             )}
-            Accedi con Google
+            Continua con Google
           </button>
           {signInError && <p className="mt-3 text-sm text-destructive">{signInError}</p>}
           <p className="mt-4 text-left text-xs text-muted-foreground leading-relaxed">

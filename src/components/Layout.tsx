@@ -13,7 +13,7 @@ const nav = [
 export function AppNav() {
   const loc = useLocation();
   return (
-    <nav className="sticky top-0 z-50 border-b border-white/40 bg-transparent">
+    <nav className="sticky top-0 z-50 border-b border-white/60 bg-white/35 backdrop-blur-2xl">
       <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
         <Link to="/iscrizione" className="flex items-center gap-3 min-w-0 self-start sm:self-auto">
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-arena">
@@ -23,7 +23,7 @@ export function AppNav() {
             Esperia 2026
           </span>
         </Link>
-        <ul className="grid grid-cols-2 gap-2 rounded-2xl border border-white/60 bg-white/70 p-2 shadow-glow backdrop-blur-xl sm:flex sm:items-center sm:gap-1 sm:rounded-full sm:p-1">
+        <ul className="grid grid-cols-2 gap-2 rounded-2xl border border-white/70 bg-white/70 p-2 shadow-glow backdrop-blur-2xl sm:flex sm:items-center sm:gap-1 sm:rounded-full sm:p-1">
           {nav.map(({ to, label, icon: Icon }) => {
             const active = loc.pathname === to;
             return (
@@ -81,7 +81,7 @@ export function PageShell({
     <div className="relative min-h-screen court-pattern">
       <AppNav />
       {!bare && (
-        <header className="relative overflow-hidden border-b border-white/50">
+        <header className="relative overflow-hidden border-b border-white/60 bg-white/30 backdrop-blur-2xl">
           <div className="relative mx-auto flex max-w-5xl flex-col gap-4 px-4 py-6 sm:gap-5 sm:py-10">
             {headerAction && <div className="self-end sm:absolute sm:right-4 sm:top-6 sm:z-10">{headerAction}</div>}
             <p className="label-caps">{TOURNAMENT_NAME}</p>
