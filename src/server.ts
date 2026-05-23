@@ -1,4 +1,5 @@
 // SSR polyfill: Supabase client references `localStorage` at module init.
+
 if (typeof globalThis.localStorage === "undefined") {
   const store = new Map<string, string>();
   (globalThis as unknown as { localStorage: Storage }).localStorage = {
