@@ -61,6 +61,7 @@ function Iscrizione() {
   const [activeEmail, setActiveEmail] = useState<string | null>(() => loadActiveEmail());
   const [showEmailPrompt, setShowEmailPrompt] = useState(false);
   const [emailConfirmed, setEmailConfirmed] = useState(() => !!loadActiveEmail());
+  const [regOpen, setRegOpen] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [teamName, setTeamName] = useState("");
   const [captain, setCaptain] = useState({ first_name: "", last_name: "", class: "", phone: "" });
@@ -78,6 +79,16 @@ function Iscrizione() {
     saveActiveEmail(sessionEmail);
     setEmailConfirmed(true);
   }, [sessionEmail]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.location.hash === "#regolamento") {
+      setRegOpen(true);
+      window.requestAnimationFrame(() => {
+        document.getElementById("regolamento")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  }, []);
 
   const { data: teams = [] } = useQuery({
     queryKey: ["teams-count"],
@@ -305,7 +316,12 @@ function Iscrizione() {
   return (
     <PageShell title="Iscrivi la squadra" subtitle={`${remaining} posti rimanenti su ${maxTeams}`}>
 
-      <details id="regolamento" className="mb-4 rounded-2xl bg-card p-4 shadow-soft">
+      <details
+        id="regolamento"
+        open={regOpen}
+        onToggle={(e) => setRegOpen((e.target as HTMLDetailsElement).open)}
+        className="mb-4 rounded-2xl bg-card p-4 shadow-soft"
+      >
         <summary className="cursor-pointer text-sm font-semibold">Regolamento del torneo</summary>
         <pre className="mt-3 whitespace-pre-wrap font-sans text-sm text-muted-foreground">{regolamento}</pre>
       </details>

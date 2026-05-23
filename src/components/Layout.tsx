@@ -105,7 +105,7 @@ export function PageShell({
         {children}
       </main>
       <footer className="mx-auto w-full max-w-5xl px-4 pb-6 text-center text-[10px] font-medium text-muted-foreground">
-        Made by Rocchi Sebastiano 5ID and Diego D&apos;ortenzio 5ID
+        Made by Sebastiano Rocchi 5ID and Diego D&apos;ortenzio 5ID
       </footer>
     </div>
   );
