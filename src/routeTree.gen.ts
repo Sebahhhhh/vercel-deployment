@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TorneoRouteImport } from './routes/torneo'
+import { Route as RegolamentoRouteImport } from './routes/regolamento'
 import { Route as IscrizioneRouteImport } from './routes/iscrizione'
 import { Route as GestioneRouteImport } from './routes/gestione'
 import { Route as IndexRouteImport } from './routes/index'
@@ -17,6 +18,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const TorneoRoute = TorneoRouteImport.update({
   id: '/torneo',
   path: '/torneo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegolamentoRoute = RegolamentoRouteImport.update({
+  id: '/regolamento',
+  path: '/regolamento',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IscrizioneRoute = IscrizioneRouteImport.update({
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/gestione': typeof GestioneRoute
   '/iscrizione': typeof IscrizioneRoute
+  '/regolamento': typeof RegolamentoRoute
   '/torneo': typeof TorneoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/gestione': typeof GestioneRoute
   '/iscrizione': typeof IscrizioneRoute
+  '/regolamento': typeof RegolamentoRoute
   '/torneo': typeof TorneoRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,28 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/gestione': typeof GestioneRoute
   '/iscrizione': typeof IscrizioneRoute
+  '/regolamento': typeof RegolamentoRoute
   '/torneo': typeof TorneoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/gestione' | '/iscrizione' | '/torneo'
+  fullPaths: '/' | '/gestione' | '/iscrizione' | '/regolamento' | '/torneo'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/gestione' | '/iscrizione' | '/torneo'
-  id: '__root__' | '/' | '/gestione' | '/iscrizione' | '/torneo'
+  to: '/' | '/gestione' | '/iscrizione' | '/regolamento' | '/torneo'
+  id:
+    | '__root__'
+    | '/'
+    | '/gestione'
+    | '/iscrizione'
+    | '/regolamento'
+    | '/torneo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GestioneRoute: typeof GestioneRoute
   IscrizioneRoute: typeof IscrizioneRoute
+  RegolamentoRoute: typeof RegolamentoRoute
   TorneoRoute: typeof TorneoRoute
 }
 
@@ -76,6 +92,13 @@ declare module '@tanstack/react-router' {
       path: '/torneo'
       fullPath: '/torneo'
       preLoaderRoute: typeof TorneoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/regolamento': {
+      id: '/regolamento'
+      path: '/regolamento'
+      fullPath: '/regolamento'
+      preLoaderRoute: typeof RegolamentoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/iscrizione': {
@@ -106,6 +129,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GestioneRoute: GestioneRoute,
   IscrizioneRoute: IscrizioneRoute,
+  RegolamentoRoute: RegolamentoRoute,
   TorneoRoute: TorneoRoute,
 }
 export const routeTree = rootRouteImport
