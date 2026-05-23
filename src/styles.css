@@ -30,55 +30,69 @@
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
-  --font-display: "Syne", system-ui, sans-serif;
-  --font-sans: "Outfit", system-ui, sans-serif;
+  --font-display: "Sora", system-ui, sans-serif;
+  --font-sans: "Manrope", system-ui, sans-serif;
 }
 
-/* Arena Strike — scuro, corallo + lime (nessun blu mare) */
+/* Liquid Glass — chiaro, elegante, futuristico */
 :root {
-  --radius: 1rem;
-  --background: #0e0d0b;
-  --foreground: #f4efe6;
-  --card: #1a1814;
-  --card-foreground: #f4efe6;
-  --primary: #ff5c3a;
-  --primary-foreground: #1a0a06;
-  --secondary: #c8f542;
-  --secondary-foreground: #1a2208;
-  --muted: #252219;
-  --muted-foreground: #a39a8c;
-  --accent: #c8f542;
-  --accent-foreground: #1a2208;
-  --destructive: #ff3b5c;
+  --radius: 1.1rem;
+  --background: #f5f7ff;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --primary: #3a6cff;
+  --primary-foreground: #f6f8ff;
+  --secondary: #35d0ff;
+  --secondary-foreground: #ecfbff;
+  --muted: #edf1ff;
+  --muted-foreground: #5a6a86;
+  --accent: #ffa96b;
+  --accent-foreground: #1a1100;
+  --destructive: #e84973;
   --destructive-foreground: #fff;
-  --success: #4ade80;
-  --success-foreground: #052e14;
-  --warning: #fbbf24;
-  --border: #322e28;
-  --input: #2a2620;
-  --ring: #ff5c3a;
+  --success: #13c18b;
+  --success-foreground: #effff8;
+  --warning: #ffb347;
+  --border: #dbe1f3;
+  --input: #dfe6fb;
+  --ring: #3a6cff;
   --pattern-court: repeating-linear-gradient(
-    -12deg,
+    -16deg,
     transparent,
-    transparent 14px,
-    oklch(1 0 0 / 0.03) 14px,
-    oklch(1 0 0 / 0.03) 15px
+    transparent 20px,
+    oklch(0.2 0.02 260 / 0.025) 20px,
+    oklch(0.2 0.02 260 / 0.025) 21px
   );
+  --background-glow: radial-gradient(circle at 16% 12%, oklch(0.97 0.09 250 / 0.9), transparent 44%),
+    radial-gradient(circle at 90% 10%, oklch(0.98 0.09 140 / 0.8), transparent 38%),
+    radial-gradient(circle at 12% 85%, oklch(0.96 0.07 320 / 0.55), transparent 36%),
+    linear-gradient(180deg, #fbfcff 0%, #eef2ff 100%);
+  --glass-surface: linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.62));
+  --glass-border: color-mix(in oklab, var(--border) 58%, white);
+  --glass-highlight: linear-gradient(130deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));
+  --glass-shadow: 0 30px 70px -38px oklch(0.24 0.08 260 / 0.3);
 }
 
 @layer base {
   * { border-color: var(--color-border); }
+  *, *::before, *::after { box-sizing: border-box; }
   html, body {
+    min-height: 100%;
     background-color: var(--background);
+    background-image: var(--background-glow);
+    background-attachment: fixed;
     color: var(--foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
+  body { margin: 0; }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
     font-weight: 700;
     letter-spacing: -0.03em;
   }
+  a, button, input, textarea, select { -webkit-tap-highlight-color: transparent; }
 }
 
 @keyframes rise {
@@ -100,24 +114,64 @@
 
 @layer utilities {
   .court-pattern { background-image: var(--pattern-court); }
+  .surface-pattern {
+    background-image: var(--background-glow);
+  }
   .stripe-accent {
     background: repeating-linear-gradient(
       90deg,
-      var(--primary) 0,
-      var(--primary) 6px,
-      var(--secondary) 6px,
-      var(--secondary) 12px
+      color-mix(in oklab, var(--primary) 80%, white) 0,
+      color-mix(in oklab, var(--primary) 80%, white) 12px,
+      color-mix(in oklab, var(--secondary) 78%, white) 12px,
+      color-mix(in oklab, var(--secondary) 78%, white) 24px,
+      color-mix(in oklab, var(--accent) 75%, white) 24px,
+      color-mix(in oklab, var(--accent) 75%, white) 36px
     );
-    background-size: 24px 100%;
+    background-size: 48px 100%;
   }
   .shadow-arena {
-    box-shadow: 0 4px 0 var(--border), 0 12px 32px -8px oklch(0 0 0 / 0.55);
+    box-shadow: 0 1px 0 color-mix(in oklab, var(--border) 70%, white), var(--glass-shadow);
   }
   .shadow-lift {
-    box-shadow: 0 8px 24px -6px oklch(0 0 0 / 0.45);
+    box-shadow: 0 16px 40px -22px oklch(0.23 0.06 260 / 0.35);
+  }
+  .shadow-soft {
+    box-shadow: 0 1px 0 color-mix(in oklab, var(--border) 62%, white), 0 18px 34px -24px oklch(0.22 0.05 255 / 0.26);
+  }
+  .shadow-glow {
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--border) 55%, white), 0 34px 90px -38px oklch(0.25 0.1 255 / 0.33);
+  }
+  .glass-surface {
+    background: var(--glass-surface);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+  }
+  .glass-panel {
+    background: var(--glass-surface);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(22px) saturate(170%);
+    -webkit-backdrop-filter: blur(22px) saturate(170%);
+    box-shadow: var(--glass-shadow);
+  }
+  .glass-sheen {
+    position: relative;
+    overflow: hidden;
+  }
+  .glass-sheen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--glass-highlight);
+    opacity: 0.6;
+    pointer-events: none;
+    mix-blend-mode: screen;
   }
   .safe-bottom { padding-bottom: max(env(safe-area-inset-bottom), 0.5rem); }
   .animate-rise { animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .animate-fade-in { animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .stagger-2 { animation-delay: 120ms; }
   .animate-score-pop { animation: score-pop 1.2s ease-in-out infinite; }
   .animate-live-ring { animation: live-ring 2s ease-out infinite; }
   .btn-primary {
@@ -126,14 +180,18 @@
     justify-content: center;
     gap: 0.5rem;
     border-radius: 9999px;
-    background-color: var(--primary);
-    padding: 0.625rem 1.25rem;
-    font-size: 0.875rem;
+    background: linear-gradient(135deg, color-mix(in oklab, var(--primary) 85%, white), color-mix(in oklab, var(--primary) 65%, black));
+    padding: 0.8rem 1.1rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: var(--primary-foreground);
-    transition: transform 0.15s ease, filter 0.15s ease;
+    box-shadow: 0 18px 36px -22px color-mix(in oklab, var(--primary) 70%, transparent);
+    transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
   }
-  .btn-primary:hover { filter: brightness(1.1); }
+  .btn-primary:hover {
+    filter: brightness(1.05);
+    box-shadow: 0 20px 40px -22px color-mix(in oklab, var(--primary) 70%, transparent);
+  }
   .btn-primary:active { transform: scale(0.95); }
   .btn-secondary {
     display: inline-flex;
@@ -142,22 +200,26 @@
     gap: 0.5rem;
     border-radius: 9999px;
     border: 2px solid var(--secondary);
-    background-color: color-mix(in oklab, var(--secondary) 10%, transparent);
-    padding: 0.625rem 1.25rem;
-    font-size: 0.875rem;
+    background-color: color-mix(in oklab, var(--secondary) 12%, white);
+    padding: 0.8rem 1.1rem;
+    font-size: 0.95rem;
     font-weight: 700;
-    color: var(--secondary);
+    color: color-mix(in oklab, var(--secondary) 78%, black);
     transition: transform 0.15s ease, background-color 0.15s ease;
   }
-  .btn-secondary:hover { background-color: color-mix(in oklab, var(--secondary) 20%, transparent); }
+  .btn-secondary:hover { background-color: color-mix(in oklab, var(--secondary) 18%, white); }
   .btn-secondary:active { transform: scale(0.95); }
   .card-arena {
-    border-radius: 1rem;
-    border: 2px solid var(--border);
-    background-color: var(--card);
-    box-shadow: 0 4px 0 var(--border), 0 12px 32px -8px oklch(0 0 0 / 0.55);
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.25rem;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-surface);
+    backdrop-filter: blur(18px) saturate(170%);
+    -webkit-backdrop-filter: blur(18px) saturate(170%);
+    box-shadow: 0 1px 0 color-mix(in oklab, var(--border) 60%, white), 0 26px 46px -28px oklch(0.22 0.06 255 / 0.3);
   }
   .label-caps {
-    @apply text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground;
+    @apply text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground;
   }
 }

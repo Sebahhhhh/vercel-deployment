@@ -11,7 +11,7 @@ export function AnnouncementBanner() {
   });
   if (!text.trim()) return null;
   return (
-    <div className="mb-4 flex gap-3 rounded-2xl border-2 border-secondary/50 bg-secondary/10 px-4 py-3">
+    <div className="mb-4 flex gap-3 rounded-2xl border border-white/70 bg-white/65 px-4 py-3 shadow-soft backdrop-blur-xl">
       <Megaphone className="h-5 w-5 shrink-0 text-secondary" />
       <p className="text-sm font-medium leading-snug">{text}</p>
     </div>
