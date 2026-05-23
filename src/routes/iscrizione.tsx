@@ -82,12 +82,17 @@ function Iscrizione() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (window.location.hash === "#regolamento") {
-      setRegOpen(true);
-      window.requestAnimationFrame(() => {
-        document.getElementById("regolamento")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }
+    const openFromHash = () => {
+      if (window.location.hash === "#regolamento") {
+        setRegOpen(true);
+        window.requestAnimationFrame(() => {
+          document.getElementById("regolamento")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+    };
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+    return () => window.removeEventListener("hashchange", openFromHash);
   }, []);
 
   const { data: teams = [] } = useQuery({
