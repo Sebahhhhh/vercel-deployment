@@ -37,7 +37,17 @@ export function LiveMatchPanel({ match, t1, t2 }: { match: Match | null; t1: Tea
       </div>
       {live ? (
         <>
-          <p className="mt-3 font-display text-xl font-bold uppercase leading-tight">{matchTitle(match, t1, t2)}</p>
+          <div className="mt-3 space-y-2">
+            <p className="font-display text-xl font-bold uppercase">{t1?.name ?? "TBD"}</p>
+            <div className="flex items-center gap-2">
+              <span className="h-px flex-1 bg-secondary/25" />
+              <span className="rounded-full bg-secondary/20 px-3 py-1 text-xs font-black uppercase tracking-[0.3em] text-secondary">
+                VS
+              </span>
+              <span className="h-px flex-1 bg-secondary/25" />
+            </div>
+            <p className="font-display text-xl font-bold uppercase">{t2?.name ?? "TBD"}</p>
+          </div>
           <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
             <Clock className="h-3.5 w-3.5" /> {formatMatchTime(match.scheduled_at)}
           </p>
@@ -56,7 +66,17 @@ export function NextMatchPanel({ match, t1, t2 }: { match: Match | null; t1: Tea
       <span className="label-caps text-primary">Prossima</span>
       {match ? (
         <>
-          <p className="mt-3 font-display text-xl font-bold uppercase">{matchTitle(match, t1, t2)}</p>
+          <div className="mt-3 space-y-2">
+            <p className="font-display text-xl font-bold uppercase">{t1?.name ?? "TBD"}</p>
+            <div className="flex items-center gap-2">
+              <span className="h-px flex-1 bg-primary/20" />
+              <span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-black uppercase tracking-[0.3em] text-primary">
+                VS
+              </span>
+              <span className="h-px flex-1 bg-primary/20" />
+            </div>
+            <p className="font-display text-xl font-bold uppercase">{t2?.name ?? "TBD"}</p>
+          </div>
           <p className="mt-3 inline-block rounded-full bg-primary/15 px-4 py-2 text-sm font-bold text-primary">
             {formatMatchTime(match.scheduled_at)}
           </p>

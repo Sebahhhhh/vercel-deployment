@@ -20,7 +20,7 @@ export function AppNav() {
             <Volleyball className="h-5 w-5" strokeWidth={2.5} />
           </span>
           <span className="truncate font-display text-sm font-semibold leading-tight sm:text-base">
-            Esperia 2026
+            Torneo Pallavolo Cogestione Esperia 2026
           </span>
         </Link>
         <ul className="grid grid-cols-2 gap-2 rounded-2xl border border-white/70 bg-white/70 p-2 shadow-glow backdrop-blur-2xl sm:flex sm:items-center sm:gap-1 sm:rounded-full sm:p-1">
