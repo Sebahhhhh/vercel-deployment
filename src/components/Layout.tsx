@@ -82,7 +82,6 @@ export function PageShell({
       <AppNav />
       {!bare && (
         <header className="relative overflow-hidden border-b border-white/50">
-          <div className="stripe-accent h-1.5 w-full" aria-hidden />
           <div className="relative mx-auto flex max-w-5xl flex-col gap-4 px-4 py-6 sm:gap-5 sm:py-10">
             {headerAction && <div className="self-end sm:absolute sm:right-4 sm:top-6 sm:z-10">{headerAction}</div>}
             <p className="label-caps">{TOURNAMENT_NAME}</p>

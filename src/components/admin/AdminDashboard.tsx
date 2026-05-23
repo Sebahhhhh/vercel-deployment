@@ -402,7 +402,15 @@ function TeamsTab({
     captain_phone: string;
     captain_email: string;
   }>;
-  members: Array<{ id: string; team_id: string; first_name: string; last_name: string; class: string }>;
+  members: Array<{
+    id: string;
+    team_id: string;
+    first_name: string;
+    last_name: string;
+    class: string;
+    position?: number | null;
+    is_reserve?: boolean | null;
+  }>;
   run: (p: Promise<unknown>, msg?: string) => Promise<void>;
 }) {
   const del = useServerFn(adminDeleteTeam);
@@ -411,6 +419,7 @@ function TeamsTab({
   const swap = useServerFn(adminSwapBracketSlots);
   const [swapA, setSwapA] = useState("");
   const [swapB, setSwapB] = useState("");
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return (
     <div className="space-y-4">
@@ -445,11 +454,22 @@ function TeamsTab({
           <Shuffle className="h-4 w-4" /> Scambia
         </button>
       </div>
-      {teams.map((t) => (
+      {teams.map((t) => {
+        const teamMembers = members
+          .filter((m) => m.team_id === t.id)
+          .sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+        const isOpen = expandedId === t.id;
+        return (
         <div key={t.id} className="card-arena p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="font-bold">{t.name}</span>
             <div className="flex gap-2">
+              <button
+                onClick={() => setExpandedId(isOpen ? null : t.id)}
+                className="rounded-full bg-muted px-3 py-1 text-[10px] font-bold text-muted-foreground"
+              >
+                {isOpen ? "Chiudi" : "Dettagli"}
+              </button>
               <input
                 type="number"
                 min={1}
@@ -475,10 +495,46 @@ function TeamsTab({
             </div>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            {t.captain_email} · {members.filter((m) => m.team_id === t.id).length} membri
+            {t.captain_email} · {teamMembers.length} membri
           </p>
+          {isOpen && (
+            <div className="mt-4 space-y-3 text-sm">
+              <div className="rounded-2xl border border-white/60 bg-white/70 p-3 shadow-soft backdrop-blur">
+                <p className="label-caps">Capitano</p>
+                <p className="mt-2 font-semibold">
+                  {t.captain_first_name} {t.captain_last_name}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Classe: {t.captain_class} · Tel: {t.captain_phone}
+                </p>
+                <p className="text-xs text-muted-foreground">Email: {t.captain_email}</p>
+              </div>
+              <div className="rounded-2xl border border-white/60 bg-white/70 p-3 shadow-soft backdrop-blur">
+                <p className="label-caps">Membri</p>
+                {teamMembers.length === 0 ? (
+                  <p className="mt-2 text-xs text-muted-foreground">Nessun membro registrato.</p>
+                ) : (
+                  <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                    {teamMembers.map((m) => (
+                      <div key={m.id} className="rounded-xl border border-white/70 bg-white/80 px-3 py-2">
+                        <p className="text-sm font-semibold">
+                          {m.first_name} {m.last_name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Classe: {m.class}
+                          {m.position ? ` · Pos: ${m.position}` : ""}
+                          {m.is_reserve ? " · Riserva" : ""}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
-      ))}
+      );
+      })}
     </div>
   );
 }

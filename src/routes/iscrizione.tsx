@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
@@ -10,7 +10,34 @@ import { signInWithGoogle } from "@/lib/google-auth";
 import { useAuth } from "@/hooks/use-auth";
 import { PageShell, TOURNAMENT_NAME, SUPPORT_EMAIL } from "@/components/Layout";
 
-const SCHOOL_DOMAIN = "@itispaleocapa.it";
+const INSTITUTIONAL_EMAIL = /^[a-z]+\.[a-z]+\.studente@itispaleocapa\.it$/;
+const EXPECTED_EMAIL_KEY = "court_expected_email";
+const DEVICE_LOCK_KEY = "court_registration_email_lock";
+
+function loadExpectedEmail() {
+  if (typeof sessionStorage === "undefined") return null;
+  return sessionStorage.getItem(EXPECTED_EMAIL_KEY);
+}
+
+function saveExpectedEmail(email: string) {
+  if (typeof sessionStorage === "undefined") return;
+  sessionStorage.setItem(EXPECTED_EMAIL_KEY, email);
+}
+
+function clearExpectedEmail() {
+  if (typeof sessionStorage === "undefined") return;
+  sessionStorage.removeItem(EXPECTED_EMAIL_KEY);
+}
+
+function loadDeviceLock() {
+  if (typeof localStorage === "undefined") return null;
+  return localStorage.getItem(DEVICE_LOCK_KEY);
+}
+
+function saveDeviceLock(email: string) {
+  if (typeof localStorage === "undefined") return;
+  localStorage.setItem(DEVICE_LOCK_KEY, email);
+}
 
 export const Route = createFileRoute("/iscrizione")({
   head: () => ({ meta: [{ title: "Iscrizione — Torneo di Pallavolo" }] }),
@@ -33,6 +60,8 @@ function Iscrizione() {
   const qc = useQueryClient();
   const { user, loading, signOut } = useAuth();
   const [signingIn, setSigningIn] = useState(false);
+  const [emailInput, setEmailInput] = useState("");
+  const [expectedEmail, setExpectedEmail] = useState<string | null>(() => loadExpectedEmail());
   const [accepted, setAccepted] = useState(false);
   const [teamName, setTeamName] = useState("");
   const [captain, setCaptain] = useState({ first_name: "", last_name: "", class: "", phone: "" });
@@ -42,7 +71,23 @@ function Iscrizione() {
   const [signInError, setSignInError] = useState<string | null>(null);
 
   const sessionEmail = user?.email?.toLowerCase() ?? null;
-  const emailValid = !!sessionEmail && sessionEmail.endsWith(SCHOOL_DOMAIN);
+  const emailValid = !!sessionEmail && INSTITUTIONAL_EMAIL.test(sessionEmail);
+  const deviceLock = loadDeviceLock();
+
+  useEffect(() => {
+    if (!sessionEmail) return;
+    const storedExpected = loadExpectedEmail();
+    if (storedExpected && sessionEmail !== storedExpected) {
+      toast.error("L'email Google non coincide con quella inserita.");
+      clearExpectedEmail();
+      void signOut();
+      return;
+    }
+    if (storedExpected && sessionEmail === storedExpected) {
+      clearExpectedEmail();
+      setExpectedEmail(null);
+    }
+  }, [sessionEmail, signOut]);
 
   const { data: teams = [] } = useQuery({
     queryKey: ["teams-count"],
@@ -76,9 +121,20 @@ function Iscrizione() {
   const closed = !registrationsOpen || remaining === 0;
 
   const loginWithGoogle = async () => {
+    const normalized = emailInput.trim().toLowerCase();
+    if (!INSTITUTIONAL_EMAIL.test(normalized)) {
+      setSignInError("Inserisci un'email valida: nome.cognome.studente@itispaleocapa.it");
+      return;
+    }
+    if (deviceLock && deviceLock !== normalized) {
+      setSignInError("Questo dispositivo ha già registrato una squadra con un'altra email.");
+      return;
+    }
     setSigningIn(true);
     setSignInError(null);
     try {
+      saveExpectedEmail(normalized);
+      setExpectedEmail(normalized);
       const { redirected, error } = await signInWithGoogle();
       if (error) {
         setSignInError(error);
@@ -108,7 +164,10 @@ function Iscrizione() {
       const r = riserve.map((m) => memberSchema.parse(m));
       if (!teamName.trim()) throw new Error("Nome squadra richiesto");
       if (!accepted) throw new Error("Devi accettare il regolamento");
-      if (!emailValid || !user) throw new Error("Usa un account @itispaleocapa.it");
+      if (!emailValid || !user) throw new Error("Usa un account nome.cognome.studente@itispaleocapa.it");
+      if (deviceLock && deviceLock !== sessionEmail) {
+        throw new Error("Questo dispositivo ha già registrato una squadra con un'altra email");
+      }
 
       setSubmitting(true);
       const { data: existing } = await supabase.from("teams").select("id").ilike("captain_email", sessionEmail!).maybeSingle();
@@ -142,6 +201,7 @@ function Iscrizione() {
       if (e2) throw new Error(e2.message);
 
       toast.success("Squadra iscritta!");
+      saveDeviceLock(sessionEmail!);
       qc.invalidateQueries();
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Errore");
@@ -160,11 +220,11 @@ function Iscrizione() {
 
   if (user && !emailValid) {
     return (
-      <PageShell title="Accesso non valido" subtitle="Usa un account @itispaleocapa.it per iscriversi">
+      <PageShell title="Accesso non valido" subtitle="Usa un account nome.cognome.studente@itispaleocapa.it">
         <div className="rounded-2xl bg-card p-6 text-center shadow-soft">
           <ShieldCheck className="mx-auto h-10 w-10 text-yellow-500" />
           <p className="mt-3 text-sm text-muted-foreground">
-            Hai effettuato l&apos;accesso con un account che non appartiene al dominio <strong>{SCHOOL_DOMAIN}</strong>.
+            Hai effettuato l&apos;accesso con un account che non rispetta il formato richiesto.
           </p>
           <button
             onClick={handleLogout}
@@ -196,13 +256,23 @@ function Iscrizione() {
           <div className="flex items-start gap-3">
             <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-secondary" />
             <p>
-              Account scolastico <strong>{SCHOOL_DOMAIN}</strong> obbligatorio.
+              Account scolastico <strong>nome.cognome.studente@itispaleocapa.it</strong> obbligatorio.
             </p>
           </div>
         </div>
 
         <div className="card-arena p-6 text-center">
-          <p className="text-sm text-muted-foreground">Accedi con Google per iscrivere la squadra.</p>
+          <p className="text-sm text-muted-foreground">Inserisci prima l&apos;email istituzionale, poi accedi con Google.</p>
+          <label className="mt-4 block text-left">
+            <span className="mb-1 block text-xs font-medium text-muted-foreground">Email istituzionale</span>
+            <input
+              type="email"
+              value={emailInput}
+              onChange={(e) => setEmailInput(e.target.value)}
+              placeholder="nome.cognome.studente@itispaleocapa.it"
+              className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+            />
+          </label>
           <button
             onClick={loginWithGoogle}
             disabled={signingIn}
@@ -231,6 +301,7 @@ function Iscrizione() {
   }
 
   if (myTeam) {
+    if (sessionEmail) saveDeviceLock(sessionEmail);
     return (
       <PageShell title="Iscrizione completata" subtitle={`Squadra: ${myTeam.name}`}>
         <div className="rounded-2xl bg-card p-6 shadow-soft">

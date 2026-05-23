@@ -64,10 +64,11 @@
     oklch(0.2 0.02 260 / 0.025) 20px,
     oklch(0.2 0.02 260 / 0.025) 21px
   );
-  --background-glow: radial-gradient(circle at 16% 12%, oklch(0.97 0.09 250 / 0.9), transparent 44%),
-    radial-gradient(circle at 90% 10%, oklch(0.98 0.09 140 / 0.8), transparent 38%),
-    radial-gradient(circle at 12% 85%, oklch(0.96 0.07 320 / 0.55), transparent 36%),
-    linear-gradient(180deg, #fbfcff 0%, #eef2ff 100%);
+  --background-glow: radial-gradient(circle at 12% 8%, oklch(0.98 0.1 255 / 0.92), transparent 46%),
+    radial-gradient(circle at 92% 12%, oklch(0.98 0.08 150 / 0.85), transparent 40%),
+    radial-gradient(circle at 8% 85%, oklch(0.97 0.08 315 / 0.55), transparent 38%),
+    radial-gradient(circle at 70% 78%, oklch(0.98 0.06 200 / 0.4), transparent 40%),
+    linear-gradient(180deg, #fcfdff 0%, #eef2ff 100%);
   --glass-surface: linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.62));
   --glass-border: color-mix(in oklab, var(--border) 58%, white);
   --glass-highlight: linear-gradient(130deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));
@@ -113,7 +114,10 @@
 }
 
 @layer utilities {
-  .court-pattern { background-image: var(--pattern-court); }
+  .court-pattern {
+    background-image: var(--background-glow), var(--pattern-court);
+    background-attachment: fixed;
+  }
   .surface-pattern {
     background-image: var(--background-glow);
   }
