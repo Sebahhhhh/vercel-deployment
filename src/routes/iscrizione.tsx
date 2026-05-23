@@ -305,7 +305,7 @@ function Iscrizione() {
   return (
     <PageShell title="Iscrivi la squadra" subtitle={`${remaining} posti rimanenti su ${maxTeams}`}>
 
-      <details className="mb-4 rounded-2xl bg-card p-4 shadow-soft">
+      <details id="regolamento" className="mb-4 rounded-2xl bg-card p-4 shadow-soft">
         <summary className="cursor-pointer text-sm font-semibold">Regolamento del torneo</summary>
         <pre className="mt-3 whitespace-pre-wrap font-sans text-sm text-muted-foreground">{regolamento}</pre>
       </details>
