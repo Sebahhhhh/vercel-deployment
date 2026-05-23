@@ -174,7 +174,6 @@ function Iscrizione() {
         captain_class: c.class,
         captain_phone: c.phone,
         captain_email: sessionEmail,
-        created_by: sessionEmail,
       }).select().single();
       if (error) {
         if (error.code === "23505" || /duplicate|unique/i.test(error.message)) {
