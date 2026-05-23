@@ -106,6 +106,12 @@ function Iscrizione() {
       return data;
     },
   });
+  const { data: myMembers = [] } = useQuery({
+    queryKey: ["my-members", myTeam?.id],
+    enabled: !!myTeam?.id,
+    queryFn: async () =>
+      (await supabase.from("team_members").select("first_name,last_name,class,is_reserve,position").eq("team_id", myTeam!.id).order("position")).data ?? [],
+  });
 
   const remaining = Math.max(0, maxTeams - teams.length);
   const closed = !registrationsOpen || remaining === 0;
@@ -270,17 +276,27 @@ function Iscrizione() {
       <PageShell title="Ti sei gia iscritto" subtitle="Riepilogo squadra">
         <div className="rounded-2xl bg-card p-6 shadow-soft">
           <ShieldCheck className="h-10 w-10 text-success" />
-          <h2 className="mt-3 text-lg font-semibold">Iscrizione confermata</h2>
+          <h2 className="mt-3 text-lg font-semibold">La tua squadra e gia registrata</h2>
           <p className="mt-2 text-sm text-muted-foreground">Squadra: <strong>{myTeam.name}</strong></p>
           <p className="mt-1 text-sm text-muted-foreground">Slot tabellone: <strong>#{myTeam.bracket_slot}</strong></p>
-          <p className="mt-2 text-xs text-muted-foreground">Email: {sessionEmail}</p>
-          <button
-            onClick={handleResetEmail}
-            disabled={!!deviceLock}
-            className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-secondary px-4 py-3 text-sm font-semibold text-foreground shadow-soft"
-          >
-            Cambia email
-          </button>
+          <div className="mt-4">
+            <p className="text-xs font-semibold text-muted-foreground">Membri partecipanti</p>
+            <div className="mt-2 grid gap-2 sm:grid-cols-2">
+              {myMembers.map((m, idx) => (
+                <div key={`${m.first_name}-${m.last_name}-${idx}`} className="rounded-xl border border-white/70 bg-white/80 px-3 py-2">
+                  <p className="text-sm font-semibold">{m.first_name} {m.last_name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    Classe: {m.class}
+                    {m.position ? ` · Pos: ${m.position}` : ""}
+                    {m.is_reserve ? " · Riserva" : ""}
+                  </p>
+                </div>
+              ))}
+              {myMembers.length === 0 && (
+                <p className="text-xs text-muted-foreground">Nessun membro registrato.</p>
+              )}
+            </div>
+          </div>
         </div>
       </PageShell>
     );
@@ -288,16 +304,6 @@ function Iscrizione() {
 
   return (
     <PageShell title="Iscrivi la squadra" subtitle={`${remaining} posti rimanenti su ${maxTeams}`}>
-      <div className="mb-3 flex items-center justify-between rounded-xl bg-card px-3 py-2 text-xs shadow-soft">
-        <span className="truncate text-muted-foreground">Email: {sessionEmail}</span>
-        <button
-          onClick={handleResetEmail}
-          disabled={!!deviceLock}
-          className="text-xs font-semibold text-accent hover:underline disabled:text-muted-foreground"
-        >
-          Cambia email
-        </button>
-      </div>
 
       <details className="mb-4 rounded-2xl bg-card p-4 shadow-soft">
         <summary className="cursor-pointer text-sm font-semibold">Regolamento del torneo</summary>
