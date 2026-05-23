@@ -1,0 +1,163 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --font-display: "Syne", system-ui, sans-serif;
+  --font-sans: "Outfit", system-ui, sans-serif;
+}
+
+/* Arena Strike — scuro, corallo + lime (nessun blu mare) */
+:root {
+  --radius: 1rem;
+  --background: #0e0d0b;
+  --foreground: #f4efe6;
+  --card: #1a1814;
+  --card-foreground: #f4efe6;
+  --primary: #ff5c3a;
+  --primary-foreground: #1a0a06;
+  --secondary: #c8f542;
+  --secondary-foreground: #1a2208;
+  --muted: #252219;
+  --muted-foreground: #a39a8c;
+  --accent: #c8f542;
+  --accent-foreground: #1a2208;
+  --destructive: #ff3b5c;
+  --destructive-foreground: #fff;
+  --success: #4ade80;
+  --success-foreground: #052e14;
+  --warning: #fbbf24;
+  --border: #322e28;
+  --input: #2a2620;
+  --ring: #ff5c3a;
+  --pattern-court: repeating-linear-gradient(
+    -12deg,
+    transparent,
+    transparent 14px,
+    oklch(1 0 0 / 0.03) 14px,
+    oklch(1 0 0 / 0.03) 15px
+  );
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html, body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes stripe-scroll {
+  from { background-position: 0 0; }
+  to { background-position: 48px 48px; }
+}
+@keyframes score-pop {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+@keyframes live-ring {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.78 0.2 128 / 0.5); }
+  50% { box-shadow: 0 0 0 8px oklch(0.78 0.2 128 / 0); }
+}
+
+@layer utilities {
+  .court-pattern { background-image: var(--pattern-court); }
+  .stripe-accent {
+    background: repeating-linear-gradient(
+      90deg,
+      var(--primary) 0,
+      var(--primary) 6px,
+      var(--secondary) 6px,
+      var(--secondary) 12px
+    );
+    background-size: 24px 100%;
+  }
+  .shadow-arena {
+    box-shadow: 0 4px 0 var(--border), 0 12px 32px -8px oklch(0 0 0 / 0.55);
+  }
+  .shadow-lift {
+    box-shadow: 0 8px 24px -6px oklch(0 0 0 / 0.45);
+  }
+  .safe-bottom { padding-bottom: max(env(safe-area-inset-bottom), 0.5rem); }
+  .animate-rise { animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .animate-score-pop { animation: score-pop 1.2s ease-in-out infinite; }
+  .animate-live-ring { animation: live-ring 2s ease-out infinite; }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    background-color: var(--primary);
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--primary-foreground);
+    transition: transform 0.15s ease, filter 0.15s ease;
+  }
+  .btn-primary:hover { filter: brightness(1.1); }
+  .btn-primary:active { transform: scale(0.95); }
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    border: 2px solid var(--secondary);
+    background-color: color-mix(in oklab, var(--secondary) 10%, transparent);
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--secondary);
+    transition: transform 0.15s ease, background-color 0.15s ease;
+  }
+  .btn-secondary:hover { background-color: color-mix(in oklab, var(--secondary) 20%, transparent); }
+  .btn-secondary:active { transform: scale(0.95); }
+  .card-arena {
+    border-radius: 1rem;
+    border: 2px solid var(--border);
+    background-color: var(--card);
+    box-shadow: 0 4px 0 var(--border), 0 12px 32px -8px oklch(0 0 0 / 0.55);
+  }
+  .label-caps {
+    @apply text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground;
+  }
+}
