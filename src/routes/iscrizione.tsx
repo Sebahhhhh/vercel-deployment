@@ -141,6 +141,10 @@ function Iscrizione() {
   };
 
   const handleResetEmail = () => {
+    if (deviceLock) {
+      toast.error("Non puoi cambiare email dopo una registrazione su questo dispositivo.");
+      return;
+    }
     clearActiveEmail();
     setActiveEmail(null);
     setEmailConfirmed(false);
@@ -263,14 +267,16 @@ function Iscrizione() {
   if (myTeam) {
     if (sessionEmail) saveDeviceLock(sessionEmail);
     return (
-      <PageShell title="Iscrizione completata" subtitle={`Squadra: ${myTeam.name}`}>
+      <PageShell title="Ti sei gia iscritto" subtitle="Riepilogo squadra">
         <div className="rounded-2xl bg-card p-6 shadow-soft">
           <ShieldCheck className="h-10 w-10 text-success" />
-          <h2 className="mt-3 text-lg font-semibold">Sei iscritto!</h2>
-          <p className="mt-1 text-sm text-muted-foreground">La tua squadra <strong>{myTeam.name}</strong> è in posizione tabellone <strong>#{myTeam.bracket_slot}</strong>.</p>
+          <h2 className="mt-3 text-lg font-semibold">Iscrizione confermata</h2>
+          <p className="mt-2 text-sm text-muted-foreground">Squadra: <strong>{myTeam.name}</strong></p>
+          <p className="mt-1 text-sm text-muted-foreground">Slot tabellone: <strong>#{myTeam.bracket_slot}</strong></p>
           <p className="mt-2 text-xs text-muted-foreground">Email: {sessionEmail}</p>
           <button
             onClick={handleResetEmail}
+            disabled={!!deviceLock}
             className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-secondary px-4 py-3 text-sm font-semibold text-foreground shadow-soft"
           >
             Cambia email
@@ -284,7 +290,13 @@ function Iscrizione() {
     <PageShell title="Iscrivi la squadra" subtitle={`${remaining} posti rimanenti su ${maxTeams}`}>
       <div className="mb-3 flex items-center justify-between rounded-xl bg-card px-3 py-2 text-xs shadow-soft">
         <span className="truncate text-muted-foreground">Email: {sessionEmail}</span>
-        <button onClick={handleResetEmail} className="text-xs font-semibold text-accent hover:underline">Cambia email</button>
+        <button
+          onClick={handleResetEmail}
+          disabled={!!deviceLock}
+          className="text-xs font-semibold text-accent hover:underline disabled:text-muted-foreground"
+        >
+          Cambia email
+        </button>
       </div>
 
       <details className="mb-4 rounded-2xl bg-card p-4 shadow-soft">
