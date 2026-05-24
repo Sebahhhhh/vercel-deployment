@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -7,6 +8,7 @@ import { Plus, Trash2, Loader2, ShieldCheck, Lock, Users, UserPlus, Crown, Spark
 import { supabase } from "@/integrations/supabase/client";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { PageShell, TOURNAMENT_NAME, SUPPORT_EMAIL } from "@/components/Layout";
+import { logRegistrationEmailAttempt } from "@/lib/telemetry.functions";
 
 const INSTITUTIONAL_EMAIL = /^[a-z]+\.[a-z]+\.studente@itispaleocapa\.it$/;
 const ACTIVE_EMAIL_KEY = "court_active_email";
@@ -69,6 +71,7 @@ function Iscrizione() {
   const [riserve, setRiserve] = useState<Member[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [signInError, setSignInError] = useState<string | null>(null);
+  const logEmailAttempt = useServerFn(logRegistrationEmailAttempt);
 
   const sessionEmail = activeEmail?.toLowerCase() ?? null;
   const emailValid = !!sessionEmail && INSTITUTIONAL_EMAIL.test(sessionEmail);
@@ -142,6 +145,7 @@ function Iscrizione() {
       setSignInError("Email istituzionale non valida");
       return;
     }
+    void logEmailAttempt({ data: { email: normalized, path: "/iscrizione" } }).catch(() => undefined);
     if (deviceLock && deviceLock !== normalized) {
       setSignInError("Questo dispositivo ha già registrato una squadra con un'altra email.");
       return;

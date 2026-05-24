@@ -1,14 +1,18 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useEffect } from "react";
 import {
   Outlet,
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
 import { Toaster } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 import { AuthBootstrap } from "@/components/AuthBootstrap";
+import { logPageView } from "@/lib/telemetry.functions";
 
 import appCss from "../styles.css?url";
 
@@ -88,6 +92,14 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const logView = useServerFn(logPageView);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const search = useRouterState({ select: (s) => s.location.search });
+
+  useEffect(() => {
+    void logView({ data: { path: `${pathname}${search}` } }).catch(() => undefined);
+  }, [pathname, search, logView]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthBootstrap />
