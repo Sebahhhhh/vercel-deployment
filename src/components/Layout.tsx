@@ -23,7 +23,7 @@ export function AppNav() {
             Torneo Pallavolo Cogestione Esperia 2026
           </span>
         </Link>
-        <div className="flex w-full flex-wrap items-center justify-center gap-2 sm:w-auto sm:justify-end">
+        <div className="flex w-full flex-col items-center justify-center gap-2 sm:w-auto sm:flex-row sm:justify-end">
           <Link
             to="/regolamento"
             aria-label="Regolamento"
