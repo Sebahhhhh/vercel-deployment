@@ -306,48 +306,6 @@ export const adminQuickMatch = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const adminListAccessLogs = createServerFn({ method: "POST" })
-  .inputValidator((d) =>
-    z
-      .object({
-        adminToken: z.string(),
-        limit: z.number().int().min(1).max(500).optional(),
-      })
-      .parse(d),
-  )
-  .handler(async ({ data }) => {
-    requireToken(data.adminToken);
-    const limit = data.limit ?? 200;
-    const { data: rows, error } = await supabaseAdmin
-      .from("access_logs")
-      .select("id,path,ip,user_agent,device,browser,os,created_at")
-      .order("created_at", { ascending: false })
-      .limit(limit);
-    if (error) throw new Error(error.message);
-    return { logs: rows ?? [] };
-  });
-
-export const adminListEmailAttempts = createServerFn({ method: "POST" })
-  .inputValidator((d) =>
-    z
-      .object({
-        adminToken: z.string(),
-        limit: z.number().int().min(1).max(500).optional(),
-      })
-      .parse(d),
-  )
-  .handler(async ({ data }) => {
-    requireToken(data.adminToken);
-    const limit = data.limit ?? 200;
-    const { data: rows, error } = await supabaseAdmin
-      .from("registration_email_attempts")
-      .select("id,email,path,ip,user_agent,device,browser,os,created_at")
-      .order("created_at", { ascending: false })
-      .limit(limit);
-    if (error) throw new Error(error.message);
-    return { attempts: rows ?? [] };
-  });
-
 export const adminGenerateBracket = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ adminToken: z.string() }).parse(d))
   .handler(async ({ data }) => {

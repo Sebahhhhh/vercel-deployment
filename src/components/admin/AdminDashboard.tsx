@@ -20,8 +20,6 @@ import {
   LockOpen,
   Lock,
   AlertTriangle,
-  Eye,
-  Mail,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageShell } from "@/components/Layout";
@@ -38,11 +36,9 @@ import {
   adminToggleEliminated,
   adminSwapBracketSlots,
   adminDeleteAllTeams,
-  adminListAccessLogs,
-  adminListEmailAttempts,
 } from "@/lib/admin.functions";
 
-type Tab = "overview" | "matches" | "teams" | "settings" | "accessi";
+type Tab = "overview" | "matches" | "teams" | "settings";
 
 export function AdminDashboard({ adminToken, onLogout }: { adminToken: string; onLogout: () => void }) {
   const [tab, setTab] = useState<Tab>("overview");
@@ -92,7 +88,6 @@ export function AdminDashboard({ adminToken, onLogout }: { adminToken: string; o
     { id: "matches", label: "Partite", icon: Swords },
     { id: "teams", label: "Squadre", icon: Users },
     { id: "settings", label: "Config", icon: Settings },
-    { id: "accessi", label: "Accessi", icon: Eye },
   ];
 
   const live = matches.filter((m) => m.status === "in_progress").length;
@@ -165,118 +160,7 @@ export function AdminDashboard({ adminToken, onLogout }: { adminToken: string; o
       {tab === "settings" && settings && (
         <SettingsTab adminToken={adminToken} settings={settings} run={run} />
       )}
-      {tab === "accessi" && <AccessiTab adminToken={adminToken} />}
     </PageShell>
-  );
-}
-
-function formatTimestamp(iso: string | null) {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  return d.toLocaleString("it-IT", {
-    year: "2-digit",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-function AccessiTab({ adminToken }: { adminToken: string }) {
-  const listAccess = useServerFn(adminListAccessLogs);
-  const listEmailAttempts = useServerFn(adminListEmailAttempts);
-
-  const { data: accessLogs = [] } = useQuery({
-    queryKey: ["adm-access-logs", adminToken],
-    queryFn: async () => (await listAccess({ data: { adminToken, limit: 200 } })).logs ?? [],
-  });
-
-  const { data: emailAttempts = [] } = useQuery({
-    queryKey: ["adm-email-attempts", adminToken],
-    queryFn: async () => (await listEmailAttempts({ data: { adminToken, limit: 200 } })).attempts ?? [],
-  });
-
-  return (
-    <div className="space-y-6">
-      <div className="card-arena p-4">
-        <p className="label-caps mb-3 flex items-center gap-2">
-          <Eye className="h-4 w-4" /> Visualizzazioni sito
-        </p>
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-xs">
-            <thead className="text-muted-foreground">
-              <tr>
-                <th className="pb-2">Quando</th>
-                <th className="pb-2">Pagina</th>
-                <th className="pb-2">IP</th>
-                <th className="pb-2">Dispositivo</th>
-                <th className="pb-2">Browser</th>
-                <th className="pb-2">OS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {accessLogs.map((row) => (
-                <tr key={row.id} className="border-t border-border/60">
-                  <td className="py-2 pr-3 font-medium">{formatTimestamp(row.created_at)}</td>
-                  <td className="py-2 pr-3 text-muted-foreground">{row.path ?? "—"}</td>
-                  <td className="py-2 pr-3">{row.ip ?? "—"}</td>
-                  <td className="py-2 pr-3">{row.device ?? "—"}</td>
-                  <td className="py-2 pr-3">{row.browser ?? "—"}</td>
-                  <td className="py-2 pr-3">{row.os ?? "—"}</td>
-                </tr>
-              ))}
-              {accessLogs.length === 0 && (
-                <tr>
-                  <td className="py-3 text-muted-foreground" colSpan={6}>
-                    Nessun accesso registrato.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className="card-arena p-4">
-        <p className="label-caps mb-3 flex items-center gap-2">
-          <Mail className="h-4 w-4" /> Tentativi email iscrizione
-        </p>
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-xs">
-            <thead className="text-muted-foreground">
-              <tr>
-                <th className="pb-2">Quando</th>
-                <th className="pb-2">Email</th>
-                <th className="pb-2">IP</th>
-                <th className="pb-2">Dispositivo</th>
-                <th className="pb-2">Browser</th>
-                <th className="pb-2">OS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {emailAttempts.map((row) => (
-                <tr key={row.id} className="border-t border-border/60">
-                  <td className="py-2 pr-3 font-medium">{formatTimestamp(row.created_at)}</td>
-                  <td className="py-2 pr-3">{row.email}</td>
-                  <td className="py-2 pr-3">{row.ip ?? "—"}</td>
-                  <td className="py-2 pr-3">{row.device ?? "—"}</td>
-                  <td className="py-2 pr-3">{row.browser ?? "—"}</td>
-                  <td className="py-2 pr-3">{row.os ?? "—"}</td>
-                </tr>
-              ))}
-              {emailAttempts.length === 0 && (
-                <tr>
-                  <td className="py-3 text-muted-foreground" colSpan={6}>
-                    Nessun tentativo registrato.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
   );
 }
 

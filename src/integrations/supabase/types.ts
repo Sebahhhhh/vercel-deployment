@@ -14,39 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      access_logs: {
-        Row: {
-          browser: string | null
-          created_at: string
-          device: string | null
-          id: string
-          ip: string | null
-          os: string | null
-          path: string | null
-          user_agent: string | null
-        }
-        Insert: {
-          browser?: string | null
-          created_at?: string
-          device?: string | null
-          id?: string
-          ip?: string | null
-          os?: string | null
-          path?: string | null
-          user_agent?: string | null
-        }
-        Update: {
-          browser?: string | null
-          created_at?: string
-          device?: string | null
-          id?: string
-          ip?: string | null
-          os?: string | null
-          path?: string | null
-          user_agent?: string | null
-        }
-        Relationships: []
-      }
       matches: {
         Row: {
           id: string
@@ -239,42 +206,6 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
-        }
-        Relationships: []
-      }
-      registration_email_attempts: {
-        Row: {
-          browser: string | null
-          created_at: string
-          device: string | null
-          email: string
-          id: string
-          ip: string | null
-          os: string | null
-          path: string | null
-          user_agent: string | null
-        }
-        Insert: {
-          browser?: string | null
-          created_at?: string
-          device?: string | null
-          email: string
-          id?: string
-          ip?: string | null
-          os?: string | null
-          path?: string | null
-          user_agent?: string | null
-        }
-        Update: {
-          browser?: string | null
-          created_at?: string
-          device?: string | null
-          email?: string
-          id?: string
-          ip?: string | null
-          os?: string | null
-          path?: string | null
-          user_agent?: string | null
         }
         Relationships: []
       }
