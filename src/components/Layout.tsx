@@ -91,7 +91,7 @@ export function PageShell({
       {!bare && (
         <header className="relative overflow-hidden border-b border-white/60 bg-white/30 backdrop-blur-2xl">
           <div className="relative mx-auto flex max-w-5xl flex-col gap-4 px-4 py-6 sm:gap-5 sm:py-10">
-            {headerAction && <div className="self-end sm:absolute sm:right-4 sm:top-6 sm:z-10">{headerAction}</div>}
+            {headerAction && <div className="absolute right-4 top-4 z-10 sm:top-6">{headerAction}</div>}
             <p className="label-caps">{TOURNAMENT_NAME}</p>
             <h1 className="select-none cursor-pointer font-display text-3xl font-semibold uppercase leading-none tracking-tight text-primary sm:text-5xl" onClick={handleSecretTap}>
               {title}
