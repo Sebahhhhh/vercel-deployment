@@ -330,12 +330,22 @@ function MatchesTab({
   );
 }
 
-function toLocal(iso: string | null) {
+function toLocalTime(iso: string | null) {
   if (!iso) return "";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
   const p = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+  return `${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+function toIsoFromTime(value: string, baseIso: string | null) {
+  if (!value) return null;
+  const [h, m] = value.split(":").map((n) => Number(n));
+  if (Number.isNaN(h) || Number.isNaN(m)) return null;
+  const base = baseIso ? new Date(baseIso) : new Date();
+  if (Number.isNaN(base.getTime())) return null;
+  base.setHours(h, m, 0, 0);
+  return base.toISOString();
 }
 
 function MatchForm({
@@ -353,7 +363,7 @@ function MatchForm({
   const [s1, setS1] = useState(match.score1?.toString() ?? "");
   const [s2, setS2] = useState(match.score2?.toString() ?? "");
   const [status, setStatus] = useState(match.status as "pending" | "in_progress" | "completed");
-  const [sched, setSched] = useState(toLocal(match.scheduled_at));
+  const [sched, setSched] = useState(toLocalTime(match.scheduled_at));
 
   return (
     <div className="mt-3 grid gap-2 sm:grid-cols-3">
@@ -366,14 +376,23 @@ function MatchForm({
         <option value="in_progress">In corso</option>
         <option value="completed">Conclusa</option>
       </select>
-      <input type="datetime-local" value={sched} onChange={(e) => setSched(e.target.value)} className="rounded-lg border-2 border-border bg-input px-2 py-2 text-sm" />
+      <input
+        type="time"
+        min="08:20"
+        max="12:00"
+        value={sched}
+        onChange={(e) => setSched(e.target.value)}
+        placeholder="08:20"
+        title="Solo orari della mattina (08:20-12:00)"
+        className="rounded-lg border-2 border-border bg-input px-2 py-2 text-sm"
+      />
       <button
         onClick={() =>
           onSave({
             score1: s1 === "" ? null : Number(s1),
             score2: s2 === "" ? null : Number(s2),
             status,
-            scheduledAt: sched ? new Date(sched).toISOString() : null,
+            scheduledAt: sched ? toIsoFromTime(sched, match.scheduled_at) : null,
           })
         }
         className="btn-primary text-xs sm:col-span-3"

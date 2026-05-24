@@ -86,13 +86,6 @@ function Torneo() {
           </div>
         ) : (
           <div className="space-y-8">
-            <div className="card-arena border-primary/20 bg-primary/5 px-5 py-4 text-sm text-muted-foreground animate-fade-in">
-              <p>
-                Orari indicativi: prima partita alle <strong className="text-foreground">8:30</strong>,
-                a seguire le altre in sequenza. Finale prevista indicativamente intorno alle
-                <strong className="text-foreground"> 11:00</strong>.
-              </p>
-            </div>
             <section className="grid gap-4 lg:grid-cols-2 animate-fade-in">
               <LiveMatchPanel
                 match={nowPlaying}
