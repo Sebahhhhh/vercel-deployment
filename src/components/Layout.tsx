@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { ClipboardList, Trophy, Volleyball } from "lucide-react";
+import { BookOpen, ClipboardList, Trophy, Volleyball } from "lucide-react";
 
 export const TOURNAMENT_NAME = "Esperia Torneo Pallavolo Cogestione 2026";
 export const SUPPORT_EMAIL = "rocchi.sebastiano.studente@itispaleocapa.it";
@@ -26,9 +26,11 @@ export function AppNav() {
         <div className="flex flex-wrap items-center gap-2">
           <Link
             to="/regolamento"
-            className="rounded-full border border-white/70 bg-white/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground hover:bg-white/80 hover:text-foreground"
+            aria-label="Regolamento"
+            className="rounded-full border border-white/70 bg-white/60 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground hover:bg-white/80 hover:text-foreground sm:px-3"
           >
-            Regolamento
+            <BookOpen className="h-3.5 w-3.5 sm:hidden" />
+            <span className="hidden sm:inline">Regolamento</span>
           </Link>
           <ul className="grid grid-cols-2 gap-2 rounded-2xl border border-white/70 bg-white/70 p-2 shadow-glow backdrop-blur-2xl sm:flex sm:items-center sm:gap-1 sm:rounded-full sm:p-1">
           {nav.map(({ to, label, icon: Icon }) => {
