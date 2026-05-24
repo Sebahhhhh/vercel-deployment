@@ -23,7 +23,7 @@ export function AppNav() {
             Torneo Pallavolo Cogestione Esperia 2026
           </span>
         </Link>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex w-full flex-wrap items-center justify-center gap-2 sm:w-auto sm:justify-end">
           <Link
             to="/regolamento"
             aria-label="Regolamento"
@@ -32,7 +32,7 @@ export function AppNav() {
             <BookOpen className="h-3.5 w-3.5 sm:hidden" />
             <span className="hidden sm:inline">Regolamento</span>
           </Link>
-          <ul className="grid grid-cols-2 gap-2 rounded-2xl border border-white/70 bg-white/70 p-2 shadow-glow backdrop-blur-2xl sm:flex sm:items-center sm:gap-1 sm:rounded-full sm:p-1">
+          <ul className="mx-auto grid grid-cols-2 gap-2 rounded-2xl border border-white/70 bg-white/70 p-2 shadow-glow backdrop-blur-2xl sm:mx-0 sm:flex sm:items-center sm:gap-1 sm:rounded-full sm:p-1">
           {nav.map(({ to, label, icon: Icon }) => {
             const active = loc.pathname === to;
             return (
