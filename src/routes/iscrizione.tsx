@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { PageShell, TOURNAMENT_NAME, SUPPORT_EMAIL } from "@/components/Layout";
 
-const INSTITUTIONAL_EMAIL = /^[a-z]+\.[a-z]+\.studente@itispaleocapa\.it$/;
+const INSTITUTIONAL_EMAIL = /^[a-zà-öø-ÿ'’-]+\.[a-zà-öø-ÿ'’-]+\.studente(?:\d{1,2})?@itispaleocapa(?:\.it)?$/i;
 const ACTIVE_EMAIL_KEY = "court_active_email";
 const DEVICE_LOCK_KEY = "court_registration_email_lock";
 
