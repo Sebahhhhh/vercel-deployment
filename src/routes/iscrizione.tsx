@@ -232,7 +232,7 @@ function Iscrizione() {
       <PageShell title="Iscrizioni chiuse" subtitle={`${maxTeams}/${maxTeams} squadre raggiunte`}>
         <div className="rounded-2xl bg-card p-6 text-center shadow-soft">
           <Lock className="mx-auto h-10 w-10 text-destructive" />
-          <p className="mt-3 text-sm text-muted-foreground">Non è più possibile iscrivere nuove squadre. Vai al tabellone per seguire il torneo.</p>
+          <p className="mt-3 text-sm text-muted-foreground">Non è più possibile iscrivere nuove squadre. Vai nella sezione live per seguire il torneo.</p>
         </div>
       </PageShell>
     );

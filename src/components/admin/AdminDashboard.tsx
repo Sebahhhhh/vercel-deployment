@@ -481,7 +481,10 @@ function TeamsTab({
         return (
         <div key={t.id} className="card-arena p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="font-bold">{t.name}</span>
+            <div>
+              <span className="font-bold">{t.name}</span>
+              <p className="mt-1 text-xs text-muted-foreground">{t.captain_email} · {teamMembers.length} membri</p>
+            </div>
             <div className="flex gap-2">
               <button
                 onClick={() => setExpandedId(isOpen ? null : t.id)}
