@@ -103,8 +103,9 @@ export function PageShell({
       <main className={`mx-auto w-full px-4 py-5 animate-rise sm:py-6 ${wide ? "max-w-6xl" : "max-w-5xl"}`}>
         {children}
       </main>
-      <footer className="mx-auto w-full max-w-5xl px-4 pb-6 text-center text-[10px] font-medium text-muted-foreground">
-        Made by Sebastiano Rocchi 5ID and Diego D&apos;ortenzio 5ID
+      <footer className="mx-auto w-full max-w-5xl px-4 pb-6 text-center text-muted-foreground">
+        <p className="text-sm font-semibold">Made by Sebastiano Rocchi 5ID and Diego D&apos;ortenzio 5ID</p>
+        <p className="text-[9px] font-medium">© 2026 Tutti i diritti riservati.</p>
       </footer>
     </div>
   );
